@@ -17,3 +17,16 @@ while True:
             words = text.split()
             time_difference = time.time() - float(words[-1])
         print(f"{words[0]} last seen {time_difference:.2f} seconds ago")
+    
+        # Nudge is named for the recipient, so the partner finds it under their own name.
+        if time_difference > 5:
+            with open(f"mailroom/{partner}-nudge.txt", "w") as f:
+                f.write("hey you've been quiet")
+            print("hey you've been quiet")
+            
+    # Nudge is read by recipient, then deleted after to prevent repeat message.
+    if os.path.exists(f"mailroom/{name}-nudge.txt"):
+        with open(f"mailroom/{name}-nudge.txt", "r") as f:
+            message = f.read()
+        print(message)
+        os.remove(f"mailroom/{name}-nudge.txt")
