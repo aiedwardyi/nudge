@@ -2,8 +2,9 @@
 import time
 import os
 
-name = input("Who am I? ")
-partner = input("Who am I talking to? ")
+# Strips path components to prevent typed name from escaping mailroom.
+name = os.path.basename(input("Who am I? "))
+partner = os.path.basename(input("Who am I talking to? "))
 nudge_sent = False
 while True:
     time.sleep(2)
