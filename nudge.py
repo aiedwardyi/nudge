@@ -21,7 +21,7 @@ while True:
 
         # Nudge is named for the recipient, so the partner finds it under their own name. After message is sent, nudge_sent is True. If time difference < 5 seconds, nudge_sent is False.
         if time_difference > 5:
-            if nudge_sent == False:
+            if not nudge_sent:
                 with open(f"mailroom/{partner}-nudge.txt", "w") as f:
                     f.write("hey you've been quiet")
                 print("hey you've been quiet")
