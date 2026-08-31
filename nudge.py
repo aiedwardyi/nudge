@@ -2,8 +2,14 @@
 import time
 import os
 
-name = input("Who am I? ")
-partner = input("Who am I talking to? ")
+# Strips path components to prevent typed name from escaping mailroom. Strips white spaces to prevent blank-looking filenames.
+name = os.path.basename(input("Who am I? "))
+name = name.strip()
+partner = os.path.basename(input("Who am I talking to? "))
+partner = partner.strip()
+if not name or not partner:
+    raise SystemExit("Please enter a valid name")
+nudge_sent = False
 while True:
     time.sleep(2)
     with open(f"mailroom/{name}.txt", "w") as f:
@@ -17,13 +23,17 @@ while True:
             words = text.split()
             time_difference = time.time() - float(words[-1])
         print(f"{words[0]} last seen {time_difference:.2f} seconds ago")
-    
-        # Nudge is named for the recipient, so the partner finds it under their own name.
+
+        # Nudge is named for the recipient, so the partner finds it under their own name. After message is sent, nudge_sent is True. If time difference < 5 seconds, nudge_sent is False.
         if time_difference > 5:
-            with open(f"mailroom/{partner}-nudge.txt", "w") as f:
-                f.write("hey you've been quiet")
-            print("hey you've been quiet")
-            
+            if not nudge_sent:
+                with open(f"mailroom/{partner}-nudge.txt", "w") as f:
+                    f.write("hey you've been quiet")
+                print("hey you've been quiet")
+                nudge_sent = True
+        else:
+            nudge_sent = False
+
     # Nudge is read by recipient, then deleted after to prevent repeat message.
     if os.path.exists(f"mailroom/{name}-nudge.txt"):
         with open(f"mailroom/{name}-nudge.txt", "r") as f:
