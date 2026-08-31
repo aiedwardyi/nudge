@@ -2,9 +2,11 @@
 import time
 import os
 
-# Strips path components to prevent typed name from escaping mailroom.
+# Strips path components to prevent typed name from escaping mailroom. Strips white spaces to prevent blank-looking filenames.
 name = os.path.basename(input("Who am I? "))
+name = name.strip()
 partner = os.path.basename(input("Who am I talking to? "))
+partner = partner.strip()
 if not name or not partner:
     raise SystemExit("Please enter a valid name")
 nudge_sent = False
