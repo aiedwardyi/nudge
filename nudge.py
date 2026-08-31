@@ -10,8 +10,15 @@ partner = partner.strip()
 if not name or not partner:
     raise SystemExit("Please enter a valid name")
 nudge_sent = False
+
+minutes = int(input("Maximum length in duration (minutes): "))
+seconds = minutes * 60
+stop_time = time.time() + seconds
+
 while True:
     time.sleep(2)
+    if time.time() > stop_time:
+        break
     with open(f"mailroom/{name}.txt", "w") as f:
         f.write(f"{name} is alive {time.time()}")
     print(f"{name} is alive")
