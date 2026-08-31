@@ -18,6 +18,7 @@ stop_time = time.time() + seconds
 while True:
     time.sleep(2)
     if time.time() > stop_time:
+        print(f"Time limit of {minutes} minute(s) reached. Stopping.")
         break
     with open(f"mailroom/{name}.txt", "w") as f:
         f.write(f"{name} is alive {time.time()}")
