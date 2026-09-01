@@ -12,6 +12,8 @@ if not name or not partner:
 nudge_sent = False
 
 minutes = int(input("Maximum length in duration (minutes): "))
+if minutes <= 0:
+    raise SystemExit("Please enter only positive numbers.")
 seconds = minutes * 60
 stop_time = time.time() + seconds
 
