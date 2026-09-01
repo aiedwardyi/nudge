@@ -13,7 +13,7 @@ nudge_sent = False
 
 # Prevent crashing from entering a non-number or an empty input.
 try:
-    minutes = int(input("Maximum length in duration (minutes): "))
+    minutes = int(input("Maximum duration (minutes): "))
 except ValueError:
     raise SystemExit("Please enter a number.")
 if minutes <= 0:
