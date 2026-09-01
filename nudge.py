@@ -10,8 +10,23 @@ partner = partner.strip()
 if not name or not partner:
     raise SystemExit("Please enter a valid name")
 nudge_sent = False
+
+# Prevent crashing from entering a non-number or an empty input.
+try:
+    minutes = int(input("Maximum duration (minutes): "))
+except ValueError:
+    raise SystemExit("Please enter a number.")
+if minutes <= 0:
+    raise SystemExit("Please enter only positive numbers.")
+seconds = minutes * 60
+# Monotonic for the deadline (immune to clock changes); time.time() for heartbeats, since both agents need a shared reference.
+stop_time = time.monotonic() + seconds
+
 while True:
     time.sleep(2)
+    if time.monotonic() > stop_time:
+        print(f"Time limit of {minutes} minute(s) reached. Stopping.")
+        break
     with open(f"mailroom/{name}.txt", "w") as f:
         f.write(f"{name} is alive {time.time()}")
     print(f"{name} is alive")
