@@ -19,11 +19,12 @@ except ValueError:
 if minutes <= 0:
     raise SystemExit("Please enter only positive numbers.")
 seconds = minutes * 60
-stop_time = time.time() + seconds
+# Monotonic for the deadline (immune to clock changes); time.time() for heartbeats, since both agents need a shared reference.
+stop_time = time.monotonic() + seconds
 
 while True:
     time.sleep(2)
-    if time.time() > stop_time:
+    if time.monotonic() > stop_time:
         print(f"Time limit of {minutes} minute(s) reached. Stopping.")
         break
     with open(f"mailroom/{name}.txt", "w") as f:
