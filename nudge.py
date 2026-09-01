@@ -11,7 +11,11 @@ if not name or not partner:
     raise SystemExit("Please enter a valid name")
 nudge_sent = False
 
-minutes = int(input("Maximum length in duration (minutes): "))
+# Prevent crashing from entering a non-number or an empty input.
+try:
+    minutes = int(input("Maximum length in duration (minutes): "))
+except ValueError:
+    raise SystemExit("Please enter a number.")
 if minutes <= 0:
     raise SystemExit("Please enter only positive numbers.")
 seconds = minutes * 60
