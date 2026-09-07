@@ -30,6 +30,8 @@ while True:
     with open(f"mailroom/{name}.txt", "w") as f:
         f.write(f"{name} is alive {time.time()}")
     print(f"{name} is alive")
+    
+    # Without append, each write wipes the previous line so sequence can't be seen. One shared file keeps the conversation bound to one history. No lock is safe because writes are 2 seconds apart.
     with open("mailroom/log.txt", "a") as f:
         f.write(f"{name} is alive {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
 
