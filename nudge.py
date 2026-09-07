@@ -22,6 +22,9 @@ seconds = minutes * 60
 # Monotonic for the deadline (immune to clock changes); time.time() for heartbeats, since both agents need a shared reference.
 stop_time = time.monotonic() + seconds
 
+# Make directory to hold conversation history.
+os.makedirs("mailroom/history", exist_ok=True)
+
 while True:
     time.sleep(2)
     if time.monotonic() > stop_time:
@@ -32,7 +35,7 @@ while True:
     print(f"{name} is alive")
     
     # Without append, each write wipes the previous line so sequence can't be seen. One shared file keeps the conversation bound to one history. No lock is safe because writes are 2 seconds apart.
-    with open("mailroom/log.txt", "a") as f:
+    with open("mailroom/history/log.txt", "a") as f:
         f.write(f"{name} is alive {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
 
     # Partner may not have started yet, so the file might not exist.
