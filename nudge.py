@@ -30,8 +30,8 @@ while True:
     with open(f"mailroom/{name}.txt", "w") as f:
         f.write(f"{name} is alive {time.time()}")
     print(f"{name} is alive")
-    with open(f"mailroom/log.txt", "a") as f:
-        f.write(f"{name} is alive {time.strftime('%H:%M:%S')}\n")
+    with open("mailroom/log.txt", "a") as f:
+        f.write(f"{name} is alive {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
 
     # Partner may not have started yet, so the file might not exist.
     if os.path.exists(f"mailroom/{partner}.txt"):
