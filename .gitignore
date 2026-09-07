@@ -1,1 +1,2 @@
-mailroom/
+mailroom/*
+!mailroom/.gitkeep
