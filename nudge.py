@@ -29,7 +29,7 @@ try:
     while True:
         time.sleep(2)
         if time.monotonic() > stop_time:
-            print(f"Time limit of {minutes} minute(s) reached. Stopping.")
+            print(f"Time limit of {minutes} minute(s) reached. {name} stopped.")
             break
         with open(f"mailroom/{name}.txt", "w") as f:
             f.write(f"{name} is alive {time.time()}")
@@ -41,11 +41,14 @@ try:
 
         # Partner may not have started yet, so the file might not exist.
         if os.path.exists(f"mailroom/{partner}.txt"):
-            with open(f"mailroom/{partner}.txt", "r") as f:
-                text = f.read()
-                words = text.split()
-                time_difference = time.time() - float(words[-1])
-            print(f"{words[0]} last seen {time_difference:.2f} seconds ago")
+            try:
+                with open(f"mailroom/{partner}.txt", "r") as f:
+                    text = f.read()
+                    words = text.split()
+                    time_difference = time.time() - float(words[-1])
+                print(f"{words[0]} last seen {time_difference:.2f} seconds ago")
+            except (IndexError, ValueError):
+                continue
 
             # Nudge is named for the recipient, so the partner finds it under their own name. After message is sent, nudge_sent is True. If time difference < 5 seconds, nudge_sent is False.
             if time_difference > 5:
@@ -70,4 +73,5 @@ except KeyboardInterrupt:
 finally:
     if os.path.exists(f"mailroom/{name}.txt"):
         os.remove(f"mailroom/{name}.txt")
-
+    if os.path.exists(f"mailroom/{name}-nudge.txt"):
+        os.remove(f"mailroom/{name}-nudge.txt")
