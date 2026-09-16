@@ -10,6 +10,7 @@ partner = partner.strip()
 if not name or not partner:
     raise SystemExit("Please enter a valid name")
 nudge_sent = False
+time_difference = 0
 
 # Prevent crashing from entering a non-number or an empty input.
 try:
@@ -25,40 +26,56 @@ stop_time = time.monotonic() + seconds
 # Make directory to hold conversation history.
 os.makedirs("mailroom/history", exist_ok=True)
 
-while True:
-    time.sleep(2)
-    if time.monotonic() > stop_time:
-        print(f"Time limit of {minutes} minute(s) reached. Stopping.")
-        break
-    with open(f"mailroom/{name}.txt", "w") as f:
-        f.write(f"{name} is alive {time.time()}")
-    print(f"{name} is alive")
-    
-    # Without append, each write wipes the previous line so sequence can't be seen. One shared file keeps the conversation bound to one history. No lock is safe because writes are 2 seconds apart.
-    with open("mailroom/history/log.txt", "a") as f:
-        f.write(f"{name} is alive {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+try:
+    while True:
+        time.sleep(2)
+        if time.monotonic() > stop_time:
+            print(f"Time limit of {minutes} minute(s) reached. {name} stopped.")
+            break
+        with open(f"mailroom/{name}.txt", "w") as f:
+            f.write(f"{name} is alive {time.time()}")
+        print(f"{name} is alive")
+        
+        # Without append, each write wipes the previous line so sequence can't be seen. One shared file keeps the conversation bound to one history. No lock is safe because writes are 2 seconds apart.
+        with open("mailroom/history/log.txt", "a") as f:
+            f.write(f"{name} is alive {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
 
-    # Partner may not have started yet, so the file might not exist.
-    if os.path.exists(f"mailroom/{partner}.txt"):
-        with open(f"mailroom/{partner}.txt", "r") as f:
-            text = f.read()
-            words = text.split()
-            time_difference = time.time() - float(words[-1])
-        print(f"{words[0]} last seen {time_difference:.2f} seconds ago")
+        # Partner may not have started yet, so the file might not exist.
+        if os.path.exists(f"mailroom/{partner}.txt"):
+            try:
+                with open(f"mailroom/{partner}.txt", "r") as f:
+                    text = f.read()
+                    words = text.split()
+                    time_difference = time.time() - float(words[-1])
+                print(f"{words[0]} last seen {time_difference:.2f} seconds ago")
+            except (IndexError, ValueError):
+                time_difference = 0
 
-        # Nudge is named for the recipient, so the partner finds it under their own name. After message is sent, nudge_sent is True. If time difference < 5 seconds, nudge_sent is False.
-        if time_difference > 5:
-            if not nudge_sent:
-                with open(f"mailroom/{partner}-nudge.txt", "w") as f:
-                    f.write("hey you've been quiet")
-                print("hey you've been quiet")
-                nudge_sent = True
-        else:
-            nudge_sent = False
+            # Nudge is named for the recipient, so the partner finds it under their own name. After message is sent, nudge_sent is True. If time difference < 5 seconds, nudge_sent is False.
+            if time_difference > 5:
+                if not nudge_sent:
+                    with open(f"mailroom/{partner}-nudge.txt", "w") as f:
+                        f.write("hey you've been quiet")
+                    print("hey you've been quiet")
+                    nudge_sent = True
+            else:
+                nudge_sent = False
 
-    # Nudge is read by recipient, then deleted after to prevent repeat message.
-    if os.path.exists(f"mailroom/{name}-nudge.txt"):
-        with open(f"mailroom/{name}-nudge.txt", "r") as f:
-            message = f.read()
-        print(message)
-        os.remove(f"mailroom/{name}-nudge.txt")
+        # Nudge is read by recipient, then deleted after to prevent repeat message.
+        if os.path.exists(f"mailroom/{name}-nudge.txt"):
+            with open(f"mailroom/{name}-nudge.txt", "r") as f:
+                message = f.read()
+            print(message)
+            os.remove(f"mailroom/{name}-nudge.txt")
+        
+# Exit cleanly so errors do not show when entering control + c. Removes the heartbeat file so partner knows it's gone.
+except KeyboardInterrupt:
+    print(f"\n{name} stopped.")
+finally:
+    try:
+        if os.path.exists(f"mailroom/{name}.txt"):
+            os.remove(f"mailroom/{name}.txt")
+        if os.path.exists(f"mailroom/{name}-nudge.txt"):
+            os.remove(f"mailroom/{name}-nudge.txt")
+    except OSError:
+        pass
